@@ -1,0 +1,23 @@
+{
+  "//": "Shared base config. Each package extends this. Legacy decorators + emitted metadata are required by the reflection stack (see PORTING.md §6, §11).",
+  "compilerOptions": {
+    "target": "ESNext",
+    "module": "ESNext",
+    "moduleResolution": "bundler",
+    "allowImportingTsExtensions": true,
+    "lib": ["ESNext"],
+    "types": ["bun", "reflect-metadata"],
+
+    "strict": true,
+    "noUncheckedIndexedAccess": true,
+    "exactOptionalPropertyTypes": true,
+    "noImplicitOverride": true,
+
+    "experimentalDecorators": true,
+    "emitDecoratorMetadata": true,
+
+    "verbatimModuleSyntax": true,
+    "skipLibCheck": true,
+    "noEmit": true
+  }
+}

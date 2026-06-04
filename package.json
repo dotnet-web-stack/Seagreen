@@ -1,0 +1,19 @@
+{
+  "name": "seagreen",
+  "private": true,
+  "type": "module",
+  "description": "TypeScript port of GenHTTP on Bun (sibling of the Kotlin port, CodeGreen). See PORTING.md.",
+  "scripts": {
+    "test": "bun test",
+    "typecheck": "tsc --noEmit",
+    "playground": "bun run src/playground/main.ts"
+  },
+  "devDependencies": {
+    "typescript": "^5.7.0",
+    "@types/bun": "latest"
+  },
+  "dependencies": {
+    "reflect-metadata": "^0.2.2",
+    "zod": "^3.24.0"
+  }
+}

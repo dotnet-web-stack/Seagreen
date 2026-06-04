@@ -13,5 +13,9 @@ import { Host } from "../engine/internal/index.ts";
 import { createApp } from "./project.ts";
 
 const port = Number(process.env.PORT ?? 8080);
-console.log(`Seagreen playground on :${port}`);
-await Host.create().handler(createApp()).port(port).run();
+const workers = Number(process.env.WORKERS ?? 1); // WORKERS=$(nproc) to use every core
+
+if (!process.env.SEAGREEN_WORKER) {
+  console.log(`Seagreen playground → http://localhost:${port}`);
+}
+await Host.create().handler(createApp()).port(port).workers(20).run();

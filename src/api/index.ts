@@ -253,6 +253,8 @@ export interface ServerHost {
   bind(address: string, port: number): ServerHost;
   development(enabled: boolean): ServerHost;
   console(): ServerHost;
+  /** Run `count` worker processes sharing the port (SO_REUSEPORT) for multi-core scaling. */
+  workers(count: number): ServerHost;
   /** Starts and returns immediately. */
   start(): Promise<ServerHost>;
   /** Stops the running server. */

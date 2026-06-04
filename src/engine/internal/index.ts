@@ -317,6 +317,7 @@ class ServerHostImpl implements ServerHost {
   private _host = "0.0.0.0";
   private _port = 8080;
   private _development = false;
+  private _workers = 1;
   private listener: { stop(closeActiveConnections?: boolean): void } | null = null;
   private stopRun: (() => void) | null = null;
 
@@ -338,6 +339,10 @@ class ServerHostImpl implements ServerHost {
     return this;
   }
   console(): ServerHost {
+    return this;
+  }
+  workers(count: number): ServerHost {
+    this._workers = Math.max(1, Math.floor(count));
     return this;
   }
 
@@ -377,6 +382,30 @@ class ServerHostImpl implements ServerHost {
   }
 
   async run(): Promise<number> {
+    // Multi-core: the primary forks `workers` copies of the entry, each serving with
+    // SO_REUSEPORT (see start()). Bun is single-threaded, so this is how all cores are used.
+    if (this._workers > 1 && !process.env.SEAGREEN_WORKER) {
+      // Re-exec this program per worker: the compiled binary itself, or `bun <entry>` in dev.
+      const compiled = Bun.main.startsWith("/$bunfs");
+      const command = compiled ? [process.execPath] : [process.execPath, Bun.main];
+      const children = Array.from({ length: this._workers }, (_, i) =>
+        Bun.spawn(command, {
+          env: { ...process.env, SEAGREEN_WORKER: String(i) },
+          stdout: "inherit",
+          stderr: "inherit",
+        }),
+      );
+      const shutdown = () => {
+        for (const child of children) child.kill();
+        process.exit(0);
+      };
+      process.on("SIGINT", shutdown);
+      process.on("SIGTERM", shutdown);
+      console.log(`Seagreen: ${this._workers} workers on :${this._port}`);
+      await Promise.all(children.map((c) => c.exited));
+      return 0;
+    }
+
     await this.start();
     await new Promise<void>((resolve) => {
       this.stopRun = resolve;

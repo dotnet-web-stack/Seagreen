@@ -21,6 +21,10 @@ bun run playground                 # start the demo server on http://localhost:8
 #   PORT=9000 bun run playground   # …or choose the port
 #   bun run src/playground/main.ts # …or run the entry file directly
 
+# Bun is single-threaded per process, so one process uses one core (~160K req/s here).
+# For all cores, run worker processes that share the port (SO_REUSEPORT):
+WORKERS=$(nproc) bun run playground   # ~linear scaling across cores
+
 bun test                           # run the acceptance suite (23 tests)
 bun run typecheck                  # type-check with tsc --noEmit
 ```
